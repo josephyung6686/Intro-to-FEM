@@ -11,3 +11,7 @@ Then, try out [Solidspy tutorials](https://solidspy.readthedocs.io/en/latest/tut
 - Basic code example for the working with SOLIDSPY
 - Code for generating half cylinder mesh and running the SOLIDSPY
 - There are folders with specific mesh conditions
+
+## Logistics for git file
+
+- Make detailed comments in the git commit
