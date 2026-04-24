@@ -10,9 +10,9 @@ import solidspy.preprocesor as pre
 # --- Geometry Parameters ---
 r_i_val = 300.0*1   # Inner radius (Major axis along Y)
 AR_val = 1   # Aspect Ratio (r_i_val / AR_val = minor axis along X)
-t_top_val = 20.0*2    # Minimum thickness at top (0 deg)
-t_side_val = t_top_val*1.5    # Maximum thickness at sides (90 deg)
-t_bot_val = t_top_val*1     # Mid thickness at bottom (180 deg)
+t_top_val = 20.0*1    # Minimum thickness at top (0 deg)
+t_side_val = t_top_val*2    # Maximum thickness at sides (90 deg)
+t_bot_val = t_top_val*2     # Mid thickness at bottom (180 deg)
 
 # --- Mesh Parameters ---
 n_theta = 80         # Number of angular divisions (bottom to top)
@@ -235,3 +235,35 @@ ax_t.legend(lines, labels, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol
 plt.title('Mechanical Response vs. Wall Geometry', fontsize=14, pad=20)
 plt.show()
 # %%
+
+# --- 1. Reshape the stress data into a grid ---
+# This transforms Sig_tt from a flat array into a grid of [radial_layer, angular_index]
+Sig_tt_grid = Sig_tt.reshape((n_r, n_theta))
+
+# --- 2. Pick an angle to analyze ---
+# Example: Index for the "Side" (approx 90 deg from top)
+target_angle_deg = 90
+# Map the angle back to the index j
+phi_in_deg_raw = 90.0 - np.degrees(theta_in_raw) # From your previous code
+j_target = np.argmin(np.abs(phi_in_deg_raw - target_angle_deg))
+
+# --- 3. Extract the stress through the thickness at that angle ---
+stress_slice = Sig_tt_grid[:, j_target]
+
+# --- 4. Calculate radial distance for the X-axis of the plot ---
+# Get the X and Y coordinates for this specific slice
+x_slice = X.reshape((n_r, n_theta))[:, j_target]
+y_slice = Y.reshape((n_r, n_theta))[:, j_target]
+
+# Radial distance from the inner wall
+dist_from_inner = np.sqrt((x_slice - x_slice[0])**2 + (y_slice - y_slice[0])**2)
+
+
+plt.figure(figsize=(10, 4))
+plt.imshow(Sig_tt_grid, aspect='auto', cmap='plasma', origin='lower',
+           extent=[0, 180, 0, 1]) # 0 to 1 represents thickness fraction
+plt.colorbar(label='$\sigma_{tt}$')
+plt.xlabel('Angle from Top (°)')
+plt.ylabel('Thickness Fraction (Inner to Outer)')
+plt.title('Hoop Stress Distribution across the entire Wall')
+plt.show()
