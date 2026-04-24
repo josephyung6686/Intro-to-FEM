@@ -9,7 +9,7 @@ import solidspy.preprocesor as pre
 # ==============================================================================
 # --- Geometry Parameters ---
 r_i_val = 300.0*1   # Inner radius (Major axis along Y)
-AR_val = 1   # Aspect Ratio (r_i_val / AR_val = minor axis along X)
+AR_val = 1.5   # Aspect Ratio (r_i_val / AR_val = minor axis along X)
 t_top_val = 20.0*1    # Minimum thickness at top (0 deg)
 t_side_val = t_top_val*2    # Maximum thickness at sides (90 deg)
 t_bot_val = t_top_val*2     # Mid thickness at bottom (180 deg)
@@ -147,6 +147,7 @@ ax1.triplot(X + U_x*scale, Y + U_y*scale, tri_elements, color='black', lw=0.5)
 ax1.set_title("Deformed Mesh", fontweight='bold')
 ax1.axis('equal'); ax1.axis('off')
 
+
 # --- Subplot 2: Von Mises Stress ---
 ax2 = plt.subplot(1, 3, 2)
 levels_vm = np.linspace(0, np.max(von_mises), 50)
@@ -220,12 +221,12 @@ ax_s.tick_params(axis='y', labelcolor='#d62728')
 ax_k.tick_params(axis='y', labelcolor="#0fdf4d")
 
 ax_t.set_xlim(0, 180)
-ax_t.set_ylim(0, 100)
+ax_t.set_ylim(0, np.max(thickness)*2)
 ax_t.set_xticks(np.arange(0, 181, 30))
 ax_t.grid(True, alpha=0.3)
 
-ax_k.set_ylim(0, 5e-3)
-ax_s.set_ylim(-1e4, 1e4)
+ax_k.set_ylim(0, np.max(kappa))
+ax_s.set_ylim(-np.max(sig_tt_smooth), np.max(sig_tt_smooth))
 
 # Combined Legend
 lines = line1 + line2 + line3
@@ -234,7 +235,6 @@ ax_t.legend(lines, labels, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol
 
 plt.title('Mechanical Response vs. Wall Geometry', fontsize=14, pad=20)
 plt.show()
-# %%
 
 # --- 1. Reshape the stress data into a grid ---
 # This transforms Sig_tt from a flat array into a grid of [radial_layer, angular_index]
